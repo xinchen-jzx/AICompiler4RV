@@ -1,0 +1,1 @@
+`mlir-tblgen -gen-dialect-decls RISCVDialect.td -I/home/jianzexin/AICompiler4RV/mlir-hello/thirdparty/llvm-project/build/include -I/home/jianzexin/AICompiler4RV/mlir-hello/thirdparty/llvm-project/mlir/include >> RISCVDialect.h`
