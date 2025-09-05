@@ -15,8 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#ifndef HELLO_HELLOOPS_H
-#define HELLO_HELLOOPS_H
+#ifndef RISCV_RISCVOPS_H
+#define RISCV_RISCVOPS_H
 
 #include "mlir/Bytecode/BytecodeOpInterface.h"
 #include "mlir/IR/BuiltinTypes.h"
@@ -26,6 +26,6 @@
 #include "mlir/Interfaces/SideEffectInterfaces.h"
 
 #define GET_OP_CLASSES
-#include "Hello/HelloOps.h.inc"
+#include "RISCV/RISCVOps.h.inc"
 
-#endif // HELLO_HELLOOPS_H
+#endif // RISCV_RISCVOPS_H

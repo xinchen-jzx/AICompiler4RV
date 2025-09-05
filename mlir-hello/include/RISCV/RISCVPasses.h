@@ -15,15 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#ifndef HELLO_HELLODIALECT_H
-#define HELLO_HELLODIALECT_H
+#ifndef MLIR_RISCV_PASSES_H
+#define MLIR_RISCV_PASSES_H
 
-#include "mlir/IR/BuiltinDialect.h"
-#include "mlir/IR/BuiltinOps.h"
-#include "mlir/IR/BuiltinTypes.h"
-#include "mlir/IR/Dialect.h"
-#include "mlir/Interfaces/SideEffectInterfaces.h"
+#include <memory>
 
-#include "Hello/HelloOpsDialect.h.inc"
+#include "mlir/Pass/Pass.h"
 
-#endif // HELLO_HELLODIALECT_H
+namespace riscv {
+// std::unique_ptr<mlir::Pass> createShapeInferencePass();  //形状推断pass
+
+std::unique_ptr<mlir::Pass> createLowerToAffinePass();
+std::unique_ptr<mlir::Pass> createLowerToLLVMPass();
+} // namespace riscv
+
+#endif // MLIR_RISCV_PASSES_H

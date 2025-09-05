@@ -1,0 +1,15 @@
+add_mlir_dialect(RISCVOps riscv)
+add_mlir_doc(RISCVDialect RISCVDialect RISCV/ -gen-dialect-doc)
+add_mlir_doc(RISCVOps RISCVOps RISCV/ -gen-op-doc)
+
+#set(LLVM_TARGET_DEFINITIONS RISCVOps.td)
+#mlir_tablegen(RISCVOps.h.inc -gen-op-decls)
+#mlir_tablegen(RISCVOps.cpp.inc -gen-op-defs)
+#mlir_tablegen(RISCVDialect.h.inc -gen-dialect-decls)
+#mlir_tablegen(RISCVDialect.cpp.inc -gen-dialect-defs)
+#add_public_tablegen_target(RISCVOpsIncGen)
+
+#set(LLVM_TARGET_DEFINITIONS ShapeInferenceInterface.td)
+#mlir_tablegen(ShapeInferenceOpInterface.h.inc -gen-op-interface-decls)
+#mlir_tablegen(ShapeInferenceOpInterface.cpp.inc -gen-op-interface-defs)
+#add_public_tablegen_target(ShapeInferenceInterfaceIncGen)

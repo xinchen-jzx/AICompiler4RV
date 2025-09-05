@@ -15,9 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-#include "Hello/HelloDialect.h"
-#include "Hello/HelloOps.h"
-#include "Hello/HelloPasses.h"
+#include "RISCV/RISCVDialect.h"
+#include "RISCV/RISCVOps.h"
+#include "RISCV/RISCVPasses.h"
 
 #include "mlir/Conversion/AffineToStandard/AffineToStandard.h"
 #include "mlir/Conversion/ArithToLLVM/ArithToLLVM.h"
@@ -40,12 +40,12 @@
 #include "llvm/ADT/Sequence.h"
 
 #include <iostream>
-
-namespace hello {
+// using namespace mlir;
+namespace riscv{
 class PrintOpLowering : public mlir::ConversionPattern {
 public:
   explicit PrintOpLowering(mlir::MLIRContext *context)
-      : mlir::ConversionPattern(hello::PrintOp::getOperationName(), 1,
+      : mlir::ConversionPattern(riscv::PrintOp::getOperationName(), 1,
                                 context) {}
 
   mlir::LogicalResult
@@ -92,7 +92,7 @@ public:
     }
 
     // Generate a call to printf for the current element of the loop.
-    auto printOp = mlir::cast<hello::PrintOp>(op);
+    auto printOp = mlir::cast<riscv::PrintOp>(op);
     auto elementLoad =
         rewriter.create<mlir::memref::LoadOp>(loc, printOp.getInput(), loopIvs);
     rewriter.create<mlir::LLVM::CallOp>(
@@ -161,7 +161,7 @@ private:
 class WorldOpLowering : public mlir::ConversionPattern {
 public:
   explicit WorldOpLowering(mlir::MLIRContext *context)
-      : mlir::ConversionPattern(hello::WorldOp::getOperationName(), 1,
+      : mlir::ConversionPattern(riscv::WorldOp::getOperationName(), 1,
                                 context) {}
 
   mlir::LogicalResult
@@ -171,12 +171,12 @@ public:
     mlir::ModuleOp parentModule = op->getParentOfType<mlir::ModuleOp>();
     auto printfRef = getOrInsertPrintf(rewriter, parentModule);
     auto loc = op->getLoc();
-    mlir::Value helloWorld = getOrCreateGlobalString(
-        loc, rewriter, "hello_word_string",
-        mlir::StringRef("Hello, World! \n\0", 16), parentModule);
+    mlir::Value riscvWorld = getOrCreateGlobalString(
+        loc, rewriter, "riscv_word_string",
+        mlir::StringRef("RISCV, World! \n\0", 16), parentModule);
 
     rewriter.create<mlir::LLVM::CallOp>(loc, getPrintfType(context),
-                                        printfRef, helloWorld);
+                                        printfRef, riscvWorld);
     rewriter.eraseOp(op);
     return mlir::success();
   }
@@ -234,14 +234,14 @@ private:
         global.getType(), globalPtr, mlir::ArrayRef<mlir::Value>({cst0, cst0}));
   }
 };
-} // namespace hello
+} // namespace riscv
 
 namespace {
-class HelloToLLVMLoweringPass
-    : public mlir::PassWrapper<HelloToLLVMLoweringPass,
+class RISCVToLLVMLoweringPass
+    : public mlir::PassWrapper<RISCVToLLVMLoweringPass,
                                mlir::OperationPass<mlir::ModuleOp>> {
 public:
-  MLIR_DEFINE_EXPLICIT_INTERNAL_INLINE_TYPE_ID(HelloToLLVMLoweringPass)
+  MLIR_DEFINE_EXPLICIT_INTERNAL_INLINE_TYPE_ID(RISCVToLLVMLoweringPass)
   void getDependentDialects(mlir::DialectRegistry &registry) const override {
     registry.insert<mlir::LLVM::LLVMDialect, mlir::scf::SCFDialect,
                     mlir::cf::ControlFlowDialect>();
@@ -251,7 +251,7 @@ public:
 };
 } // namespace
 
-void HelloToLLVMLoweringPass::runOnOperation() {
+void RISCVToLLVMLoweringPass::runOnOperation() {
   mlir::LLVMConversionTarget target(getContext());
   target.addLegalOp<mlir::ModuleOp>();
 
@@ -267,7 +267,7 @@ void HelloToLLVMLoweringPass::runOnOperation() {
                                                         patterns);
   populateFuncToLLVMConversionPatterns(typeConverter, patterns);
 
-  patterns.add<hello::PrintOpLowering, hello::WorldOpLowering>(&getContext());
+  patterns.add<riscv::PrintOpLowering, riscv::WorldOpLowering>(&getContext());
 
   auto module = getOperation();
   if (failed(applyFullConversion(module, target, std::move(patterns)))) {
@@ -275,6 +275,6 @@ void HelloToLLVMLoweringPass::runOnOperation() {
   }
 }
 
-std::unique_ptr<mlir::Pass> hello::createLowerToLLVMPass() {
-  return std::make_unique<HelloToLLVMLoweringPass>();
+std::unique_ptr<mlir::Pass> riscv::createLowerToLLVMPass() {
+  return std::make_unique<RISCVToLLVMLoweringPass>();
 }

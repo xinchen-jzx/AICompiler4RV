@@ -33,12 +33,12 @@
 #include "llvm/Support/TargetSelect.h"
 #include "llvm/Support/ToolOutputFile.h"
 
-#include "Hello/HelloDialect.h"
-#include "Hello/HelloPasses.h"
-
+#include "RISCV/RISCVDialect.h"
+#include "RISCV/RISCVPasses.h"
+// using namespace mlir::riscv;
 namespace cl = llvm::cl;
 static cl::opt<std::string> inputFilename(cl::Positional,
-                                          cl::desc("<input hello file>"),
+                                          cl::desc("<input riscv file>"),
                                           cl::init("-"),
                                           cl::value_desc("filename"));
 
@@ -111,9 +111,9 @@ int loadAndProcessMLIR(mlir::MLIRContext &context,
   mlir::PassManager passManager(&context);
   if (mlir::failed(mlir::applyPassManagerCLOptions(passManager)))
     return 4;
-
-  passManager.addPass(hello::createLowerToAffinePass());
-  passManager.addPass(hello::createLowerToLLVMPass());
+  // passManager.addPass(mlir::riscv::createShapeInferencePass());
+  passManager.addPass(riscv::createLowerToAffinePass());
+  passManager.addPass(riscv::createLowerToLLVMPass());
 
   if (mlir::failed(passManager.run(*module))) {
     return 4;
@@ -157,9 +157,9 @@ int main(int argc, char **argv) {
   mlir::registerMLIRContextCLOptions();
   mlir::registerPassManagerCLOptions();
 
-  cl::ParseCommandLineOptions(argc, argv, "Hello compiler\n");
+  cl::ParseCommandLineOptions(argc, argv, "RISCV compiler\n");
   mlir::MLIRContext context;
-  context.getOrLoadDialect<hello::HelloDialect>();
+  context.getOrLoadDialect<riscv::RISCVDialect>();
   context.getOrLoadDialect<mlir::func::FuncDialect>();
 
   mlir::OwningOpRef<mlir::ModuleOp> module;
